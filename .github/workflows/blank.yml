@@ -41,17 +41,19 @@ jobs:
                     line for line in decoded_data.splitlines()
                     if "#👨🏻‍💻 DEVELOPED-BY SOROUSH-MIRZAEI 📌 FOLLOW-CONTACT SYDSRSMRZ" not in line
                 )
-                with open("decoded_output.txt", "w", encoding="utf-8") as file:
+                with open("vpn.txt", "w", encoding="utf-8") as file:
                     file.write(filtered_data)
-                print("Filtered data saved to decoded_output.txt")
+                print("Filtered data saved to vpn.txt")
             except Exception as e:
                 print(f"Decoding error: {e}")
         else:
             print(f"Error fetching URL. Status code: {response.status_code}")
         EOF
 
-    - name: Upload output file
-      uses: actions/upload-artifact@v3
-      with:
-        name: decoded_output
-        path: decoded_output.txt
+    - name: Commit and push vpn.txt
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add vpn.txt
+        git commit -m "Add updated vpn.txt file"
+        git push
