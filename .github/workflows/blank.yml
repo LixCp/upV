@@ -1,0 +1,54 @@
+name: Decode and Filter Base64 Data
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  decode-filter:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Run script
+      env:
+        URL: ${{ secrets.ENCODED_URL }}
+      run: |
+        import base64
+        import requests
+
+        url = "${{ secrets.ENCODED_URL }}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            encoded_data = response.text
+            try:
+                decoded_data = base64.b64decode(encoded_data).decode("utf-8")
+                filtered_data = "\n".join(
+                    line for line in decoded_data.splitlines()
+                    if "#👨🏻‍💻 DEVELOPED-BY SOROUSH-MIRZAEI 📌 FOLLOW-CONTACT SYDSRSMRZ" not in line
+                )
+                with open("decoded_output.txt", "w", encoding="utf-8") as file:
+                    file.write(filtered_data)
+                print("Filtered data saved to decoded_output.txt")
+            except Exception as e:
+                print(f"Decoding error: {e}")
+        else:
+            print(f"Error fetching URL. Status code: {response.status_code}")
+    - name: Upload output file
+      uses: actions/upload-artifact@v3
+      with:
+        name: decoded_output
+        path: decoded_output.txt
