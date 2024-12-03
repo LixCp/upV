@@ -17,7 +17,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.x
+        python-version: 3.12
 
     - name: Install dependencies
       run: pip install requests
@@ -26,6 +26,7 @@ jobs:
       env:
         URL: ${{ secrets.ENCODED_URL }}
       run: |
+        python - <<EOF
         import base64
         import requests
 
@@ -47,6 +48,8 @@ jobs:
                 print(f"Decoding error: {e}")
         else:
             print(f"Error fetching URL. Status code: {response.status_code}")
+        EOF
+
     - name: Upload output file
       uses: actions/upload-artifact@v3
       with:
