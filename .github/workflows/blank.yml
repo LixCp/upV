@@ -2,7 +2,7 @@ name: Decode and Filter Base64 Data
 
 on:
   schedule:
-    - cron: "0 * * * *" 
+    - cron: "0 * * * *" # اجرای هر یک ساعت
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: pip install requests
 
-    - name: Run script
+    - name: Run script and replace file
       env:
         URL: ${{ secrets.ENCODED_URL }}
       run: |
@@ -49,15 +49,12 @@ jobs:
             print(f"Error fetching URL. Status code: {response.status_code}")
         EOF
 
-    - name: Commit and push vpn.txt
+    - name: Commit and push updated vpn.txt
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        if ! git diff --quiet; then
-          git add vpn.txt
-          git commit -m "Add updated vpn.txt file"
-          git push
-        else
-          echo "No changes detected, skipping commit."
-        fi
+        git add vpn.txt
+        git commit -m "Replace and update vpn.txt file"
+        git push
+        echo "vpn.txt updated successfully"
       continue-on-error: true
